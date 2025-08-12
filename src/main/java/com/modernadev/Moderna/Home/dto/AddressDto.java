@@ -15,9 +15,10 @@ import org.joda.time.LocalDateTime;
 public class AddressDto {
     private Long id;
     private String street;
+    private String ward;
+    private String district;
     private String city;
-    private String state;
-    private String zipCode;
+    private String postalCode;
     private String country;
 
     private UserDto user;

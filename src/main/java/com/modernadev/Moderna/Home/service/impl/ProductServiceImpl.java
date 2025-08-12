@@ -8,7 +8,7 @@ import com.modernadev.Moderna.Home.exception.NotFoundException;
 import com.modernadev.Moderna.Home.mapper.EntityDtoMapper;
 import com.modernadev.Moderna.Home.repository.CategoryRepo;
 import com.modernadev.Moderna.Home.repository.ProductRepo;
-import com.modernadev.Moderna.Home.service.AwsS3Service;
+import com.modernadev.Moderna.Home.service.CloudinaryService;
 import com.modernadev.Moderna.Home.service.interf.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,12 +28,12 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepo productRepo;
     private final CategoryRepo categoryRepo;
     private final EntityDtoMapper  entityDtoMapper;
-    private final AwsS3Service awsS3Service;
-
+//    private final AwsS3Service awsS3Service;
+    private final CloudinaryService cloudinaryService;
     @Override
     public Response createProduct(Long categoryId, MultipartFile image, String name, String description, BigDecimal price) {
         Category category = categoryRepo.findById(categoryId).orElseThrow(() -> new NotFoundException("Category Not Found"));
-        String productImage = awsS3Service.saveImageToS3(image);
+        String productImage = cloudinaryService.uploadImage(image);
 
         Product product = new Product();
         product.setCategory(category);
@@ -58,7 +58,7 @@ public class ProductServiceImpl implements ProductService {
             category =  categoryRepo.findById(categoryId).orElseThrow(() -> new NotFoundException("Category Not Found"));
         }
         if(image != null && !image.isEmpty()) {
-            productImage = awsS3Service.saveImageToS3(image);
+            productImage = cloudinaryService.uploadImage(image);
         }
 
         if(category != null) product.setCategory(category);
@@ -93,7 +93,7 @@ public class ProductServiceImpl implements ProductService {
 
         return Response.builder()
                 .status(200)
-                .message("Product Details Updated Successfully!")
+                .message("Product Details Successfully!")
                 .productDto(productDto)
                 .build();
     }

@@ -11,6 +11,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrderRequest {
     private BigDecimal totalPrice;
-    private List<OrderItemRequest> orderItemRequestList;
+    private List<OrderItemRequest> items;
     private Payment payment;
 }

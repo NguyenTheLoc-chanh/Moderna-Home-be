@@ -27,8 +27,9 @@ public class EntityDtoMapper {
         addressDto.setCity(address.getCity());
         addressDto.setCountry(address.getCountry());
         addressDto.setStreet(address.getStreet());
-        addressDto.setState(address.getState());
-        addressDto.setZipCode(address.getZipCode());
+        addressDto.setDistrict(address.getDistrict());
+        addressDto.setPostalCode(address.getPostalCode());
+        addressDto.setWard(address.getWard());
         return  addressDto;
     }
 

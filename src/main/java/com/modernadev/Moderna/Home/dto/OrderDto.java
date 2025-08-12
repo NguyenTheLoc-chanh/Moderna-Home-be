@@ -18,6 +18,6 @@ import java.util.List;
 public class OrderDto {
     private Long id;
     private BigDecimal totalPrice;
-    private List<OrderItemDto> orderItemDtoList;
+    private List<OrderItemRequest> orderItemDtoList;
     private LocalDateTime createdAt;
 }

@@ -1,5 +1,6 @@
 package com.modernadev.Moderna.Home.service.impl;
 
+import com.modernadev.Moderna.Home.dto.OrderItemDto;
 import com.modernadev.Moderna.Home.dto.OrderRequest;
 import com.modernadev.Moderna.Home.dto.Response;
 import com.modernadev.Moderna.Home.entity.Order;
@@ -14,9 +15,12 @@ import com.modernadev.Moderna.Home.repository.OrderRepo;
 import com.modernadev.Moderna.Home.repository.ProductRepo;
 import com.modernadev.Moderna.Home.service.interf.OrderItemService;
 import com.modernadev.Moderna.Home.service.interf.UserService;
+import com.modernadev.Moderna.Home.specification.OrderItemSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -40,9 +44,10 @@ public class OrderItemServiceImpl implements OrderItemService {
         User user = userService.getLoginUser();
 
         // Map Order request items to order entities
-        List<OrderItem> orderItems = orderRequest.getOrderItemRequestList().stream().map(orderItemRequest -> {
+        List<OrderItem> orderItems = orderRequest.getItems().stream().map(orderItemRequest -> {
             Product product = productRepo.findById(orderItemRequest.getProductId())
                     .orElseThrow(() -> new NotFoundException("Product not found"));
+
             OrderItem orderItem = new OrderItem();
             orderItem.setProduct(product);
             orderItem.setQuantity(orderItemRequest.getQuantity());
@@ -62,6 +67,8 @@ public class OrderItemServiceImpl implements OrderItemService {
         // Set the order reference in each order item
         orderItems.forEach(orderItem -> orderItem.setOrder(order));
 
+        orderRepo.save(order);
+
         return Response.builder()
                 .status(200)
                 .message("Order was successfully placed.")
@@ -70,11 +77,40 @@ public class OrderItemServiceImpl implements OrderItemService {
 
     @Override
     public Response updateOrderItemStatus(Long orderItemId, String status) {
-        return null;
+        OrderItem orderItem = orderItemRepo.findById(orderItemId)
+                .orElseThrow(() -> new NotFoundException("OrderItem not found"));
+
+        orderItem.setOrderStatus(OrderStatus.valueOf(status.toUpperCase()));
+        orderItemRepo.save(orderItem);
+
+        return Response.builder()
+                .status(200)
+                .message("Order was successfully updated.")
+                .build();
     }
 
     @Override
     public Response filterOrderItemStatus(OrderStatus orderStatus, LocalDateTime startDate, LocalDateTime endDate, Long itemId, Pageable pageable) {
-        return null;
+        Specification<OrderItem> spec = Specification.allOf(
+                OrderItemSpecification.hasStatus(orderStatus),
+                OrderItemSpecification.createdBetween(startDate, endDate),
+                OrderItemSpecification.hasItemId(itemId)
+        );
+        Page<OrderItem> orderItemsPage = orderItemRepo.findAll(spec, pageable);
+
+        if(orderItemsPage.isEmpty()){
+            throw new NotFoundException("OrderItem not found");
+        }
+        List<OrderItemDto> orderItemDtoList = orderItemsPage.getContent().stream()
+                .map(entityDtoMapper::mapOrderItemToDtoPlusProductAndUser)
+                .collect(Collectors.toList());
+
+        return Response.builder()
+                .status(200)
+                .message("Filtered order items retrieved successfully.")
+                .orderItemDtoList(orderItemDtoList)
+                .totalPage(orderItemsPage.getTotalPages())
+                .totalElements(orderItemsPage.getTotalElements())
+                .build();
     }
 }

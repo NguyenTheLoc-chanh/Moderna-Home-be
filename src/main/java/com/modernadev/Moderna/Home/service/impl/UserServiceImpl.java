@@ -47,6 +47,7 @@ public class UserServiceImpl implements UserService {
                 .name(registrationRequest.getName())
                 .email(registrationRequest.getEmail())
                 .password(passwordEncoder.encode(registrationRequest.getPassword()))
+                .phoneNumber(registrationRequest.getPhoneNumber())
                 .userRole(userRole)
                 .build();
 
@@ -75,7 +76,7 @@ public class UserServiceImpl implements UserService {
                 .message("Login successful!")
                 .token(token)
                 .expirationTime("1 day")
-                .role(user.getUserRole().name())
+                .userRole(user.getUserRole().name())
                 .build();
     }
 

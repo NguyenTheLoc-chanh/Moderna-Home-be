@@ -31,20 +31,23 @@ public class JwtUtils {
         byte[] keyBytes = secreteJwtString.getBytes();
         this.secretKey = new SecretKeySpec(keyBytes, "HmacSHA256");
     }
+    public String generateToken(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", user.getUserRole().name()); // lưu quyền vào token
 
-    public String generateToken(User user){
-        String username = user.getEmail();
-        return generateToken(username);
+        return buildToken(claims, user.getEmail());
     }
 
-    public String generateToken(String username){
+    public String buildToken(Map<String, Object> claims, String subject){
         return Jwts.builder()
-                .subject(username)
+                .claims(claims)
+                .subject(subject)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(secretKey)
                 .compact();
     }
+
 
     public String getUserNameFromToken(String token){
         return extractClaim(token, Claims::getSubject);

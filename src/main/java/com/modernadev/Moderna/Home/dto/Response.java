@@ -16,7 +16,7 @@ public class Response {
     private final LocalDateTime timestamp = LocalDateTime.now();
 
     private String token;
-    private String role;
+    private String userRole;
     private String expirationTime;
 
     private int totalPage;

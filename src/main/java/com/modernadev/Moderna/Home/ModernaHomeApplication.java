@@ -12,8 +12,9 @@ public class ModernaHomeApplication {
 	public static void main(String[] args) {
 		// Load biến từ file .env
 		Dotenv dotenv = Dotenv.load();
-		System.setProperty("AWS_S3_ACCESS", Objects.requireNonNull(dotenv.get("AWS_S3_ACCESS")));
-		System.setProperty("AWS_S3_SECRET", Objects.requireNonNull(dotenv.get("AWS_S3_SECRET")));
+		System.setProperty("CLOUD_NAME", Objects.requireNonNull(dotenv.get("CLOUD_NAME")));
+		System.setProperty("CLOUD_API_KEY", Objects.requireNonNull(dotenv.get("CLOUD_API_KEY")));
+		System.setProperty("CLOUD_API_SECRET", Objects.requireNonNull(dotenv.get("CLOUD_API_SECRET")));
 
 		SpringApplication.run(ModernaHomeApplication.class, args);
 	}
